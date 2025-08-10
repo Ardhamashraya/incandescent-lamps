@@ -3,76 +3,149 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Animated Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', sans-serif;
         }
         body {
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(-45deg, #ff7eb3, #ff758c, #ff6a88, #ff99ac);
-            background-size: 400% 400%;
-            animation: gradientBG 8s ease infinite;
+            background: #0f2027;  /* fallback for old browsers */
+            background: linear-gradient(45deg, #2c5364, #203a43, #0f2027);
+            overflow: hidden;
         }
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 0;
         }
         .login-box {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 1;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
             padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
             text-align: center;
-            width: 320px;
+            width: 350px;
             animation: fadeIn 1s ease forwards;
         }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
+            from { opacity: 0; transform: translateY(-30px); }
             to { opacity: 1; transform: translateY(0); }
         }
         .login-box h2 {
-            color: white;
-            margin-bottom: 20px;
+            color: #fff;
+            margin-bottom: 25px;
+            font-weight: 600;
         }
         .login-box input {
             width: 100%;
-            padding: 10px;
-            margin: 10px 0;
+            padding: 12px;
+            margin: 12px 0;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             outline: none;
             font-size: 14px;
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            transition: 0.3s;
+        }
+        .login-box input:focus {
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 10px #00f5ff;
         }
         .login-box button {
             width: 100%;
-            padding: 10px;
-            background: #ff758c;
+            padding: 12px;
+            background: linear-gradient(45deg, #00f5ff, #00d9ff);
             border: none;
-            border-radius: 5px;
-            color: white;
+            border-radius: 8px;
+            color: #000;
+            font-weight: 600;
             font-size: 16px;
             cursor: pointer;
             transition: 0.3s;
         }
         .login-box button:hover {
-            background: #ff6a88;
+            background: linear-gradient(45deg, #00d9ff, #00f5ff);
+            box-shadow: 0 0 15px #00f5ff;
         }
     </style>
 </head>
 <body>
+    <canvas id="bg"></canvas>
     <div class="login-box">
-        <h2>Login</h2>
+        <h2>Welcome Back</h2>
         <input type="text" placeholder="Username" required>
         <input type="password" placeholder="Password" required>
         <button>Sign In</button>
-    </div>
+    </div><script>
+    const canvas = document.getElementById('bg');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const particles = [];
+    const colors = ['#00f5ff', '#00d9ff', '#00bfff'];
+
+    class Particle {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.size = Math.random() * 3 + 1;
+            this.speedX = Math.random() * 1 - 0.5;
+            this.speedY = Math.random() * 1 - 0.5;
+            this.color = colors[Math.floor(Math.random() * colors.length)];
+        }
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            if (this.size > 0.2) this.size -= 0.01;
+        }
+        draw() {
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    function init() {
+        for (let i = 0; i < 100; i++) {
+            particles.push(new Particle());
+        }
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach((p, index) => {
+            p.update();
+            p.draw();
+            if (p.size <= 0.2) {
+                particles.splice(index, 1);
+                particles.push(new Particle());
+            }
+        });
+        requestAnimationFrame(animate);
+    }
+
+    init();
+    animate();
+
+    window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    });
+</script>
+
 </body>
 </html>
